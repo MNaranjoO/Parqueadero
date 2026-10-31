@@ -40,7 +40,7 @@ public class GestionParqueadero {
             SCANNER.nextLine();
 
             switch (opcion) {
-                case 1 -> System.out.println("Registro de entrada (pendiente)");
+                case 1 -> registrarEntrada();
                 case 2 -> System.out.println("Registro de salida (pendiente)");
                 case 3 -> System.out.println("Reporte de ocupación (pendiente)");
                 case 4 -> System.out.println("Reporte financiero (pendiente)");
@@ -71,5 +71,44 @@ public class GestionParqueadero {
         celdasLibres = CAPACIDAD_TOTAL;
         recaudoCarros = 0;
         recaudoMotos = 0;
+    }
+
+    static void imprimir(String mensaje) {
+        System.out.println(mensaje);
+    }
+
+    static void registrarEntrada() {
+        int posicion = -1;
+        for (int i = 0; i < CAPACIDAD_TOTAL && posicion == -1; i++) {
+            if (tiposVehiculo[i] == null) {
+                posicion = i;
+            }
+        }
+
+        if (posicion == -1) {
+            imprimir("El parqueadero está lleno.");
+            return;
+        }
+
+        System.out.print("Tipo de vehículo (1. Carro, 2. Moto): ");
+        int opcionTipo = SCANNER.nextInt();
+        SCANNER.nextLine();
+
+        if (opcionTipo != 1 && opcionTipo != 2) {
+            imprimir("Tipo de vehículo no válido.");
+            return;
+        }
+        String tipo = opcionTipo == 1 ? TIPO_CARRO : TIPO_MOTO;
+
+        System.out.print("Fecha y hora de ingreso (yyyy-MM-dd HH:mm): ");
+        LocalDateTime ingreso =
+                LocalDateTime.parse(SCANNER.nextLine().trim(), FORMATO_FECHA_HORA);
+
+        tiposVehiculo[posicion] = tipo;
+        fechasIngreso[posicion] = ingreso;
+        celdasOcupadas++;
+        celdasLibres--;
+
+        imprimir("Vehículo (" + tipo + ") asignado a la celda " + (posicion + 1));
     }
 }

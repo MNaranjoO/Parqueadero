@@ -40,7 +40,7 @@ public class GestionParqueadero {
 
             switch (opcion) {
                 case 1 -> registrarEntrada();
-                case 2 -> System.out.println("Registro de salida (pendiente)");
+                case 2 -> registrarSalida();
                 case 3 -> System.out.println("Reporte de ocupación (pendiente)");
                 case 4 -> System.out.println("Reporte financiero (pendiente)");
                 case 5 -> System.out.println("Hasta pronto.");
@@ -101,6 +101,44 @@ public class GestionParqueadero {
         celdasLibres--;
 
         imprimir("Vehículo (" + tipo + ") asignado a la celda " + (posicion + 1));
+    }
+
+    static void registrarSalida() {
+        int posicion = leerPosicion() - 1;
+
+        if (tiposVehiculo[posicion] == null) {
+            imprimir("La celda " + (posicion + 1) + " está libre.");
+            return;
+        }
+
+        LocalDateTime ingreso = fechasIngreso[posicion];
+        LocalDateTime salida;
+        while (true) {
+            salida = leerFechaHora("Fecha y hora de salida (yyyy-MM-dd HH:mm): ");
+            if (!salida.isBefore(ingreso)) {
+                break;
+            }
+            imprimir("La salida no puede ser anterior al ingreso ("
+                    + ingreso.format(FORMATO_FECHA_HORA) + ").");
+        }
+
+        long total = liquidar(posicion, salida);
+
+        if (tiposVehiculo[posicion].equals(TIPO_CARRO)) {
+            recaudoCarros += total;
+        } else {
+            recaudoMotos += total;
+        }
+
+        tiposVehiculo[posicion] = null;
+        fechasIngreso[posicion] = null;
+        celdasOcupadas--;
+        celdasLibres++;
+    }
+
+    static long liquidar(int posicion, LocalDateTime salida) {
+        imprimir("Celda " + (posicion + 1) + " liberada (factura pendiente).");
+        return 0;
     }
 
     static int leerEntero(String mensaje, int minimo, int maximo) {

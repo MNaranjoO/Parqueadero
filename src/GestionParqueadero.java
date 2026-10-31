@@ -1,5 +1,7 @@
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
 
 public class GestionParqueadero {
@@ -41,9 +43,9 @@ public class GestionParqueadero {
             switch (opcion) {
                 case 1 -> registrarEntrada();
                 case 2 -> registrarSalida();
-                case 3 -> System.out.println("Reporte de ocupación (pendiente)");
-                case 4 -> System.out.println("Reporte financiero (pendiente)");
-                case 5 -> System.out.println("Hasta pronto.");
+                case 3 -> imprimir("Reporte de ocupación (pendiente)");
+                case 4 -> imprimir("Reporte financiero (pendiente)");
+                case 5 -> imprimir("Hasta pronto.");
             }
         } while (opcion != 5);
 
@@ -51,12 +53,13 @@ public class GestionParqueadero {
     }
 
     static void mostrarMenu() {
-        System.out.println("\n=== PARQUEADERO ===");
-        System.out.println("1. Registrar entrada");
-        System.out.println("2. Registrar salida");
-        System.out.println("3. Reporte de ocupación");
-        System.out.println("4. Reporte financiero");
-        System.out.println("5. Salir");
+        imprimir("");
+        imprimir("PARQUEADERO");
+        imprimir("1. Registrar entrada");
+        imprimir("2. Registrar salida");
+        imprimir("3. Reporte de ocupación");
+        imprimir("4. Reporte financiero");
+        imprimir("5. Salir");
     }
 
     static void inicializarDatos() {
@@ -137,8 +140,52 @@ public class GestionParqueadero {
     }
 
     static long liquidar(int posicion, LocalDateTime salida) {
-        imprimir("Celda " + (posicion + 1) + " liberada (factura pendiente).");
-        return 0;
+        LocalDateTime ingreso = fechasIngreso[posicion];
+        boolean esCarro = tiposVehiculo[posicion].equals(TIPO_CARRO);
+        int tarifaDia = esCarro ? TARIFA_DIA_CARRO : TARIFA_DIA_MOTO;
+        int tarifaHora = esCarro ? TARIFA_HORA_CARRO : TARIFA_HORA_MOTO;
+
+        diasACobrar = contarDiasCompletos(ingreso, salida);
+        LocalDateTime cursor = ingreso.plusDays(diasACobrar);
+        horasACobrar = calcularHorasRestantes(cursor, salida);
+
+        if (horasACobrar >= UMBRAL_HORAS_DIA) {
+            diasACobrar++;
+            horasACobrar = 0;
+        }
+
+        long total = diasACobrar * tarifaDia + horasACobrar * tarifaHora;
+        mostrarFactura(posicion, ingreso, salida, tarifaDia, tarifaHora, total);
+        return total;
+    }
+
+    static long contarDiasCompletos(LocalDateTime ingreso, LocalDateTime salida) {
+        return ChronoUnit.DAYS.between(ingreso, salida);
+    }
+
+    static long calcularHorasRestantes(LocalDateTime cursor, LocalDateTime salida) {
+        long minutosRestantes = Duration.between(cursor, salida).toMinutes();
+        return (minutosRestantes + 59) / 60;
+    }
+
+    static void mostrarFactura(int posicion, LocalDateTime ingreso,
+                               LocalDateTime salida, int tarifaDia,
+                               int tarifaHora, long total) {
+        imprimir("");
+        imprimir("Factura");
+        imprimir("Celda liberada: " + (posicion + 1));
+        imprimir("Tipo de vehículo: " + tiposVehiculo[posicion]);
+        imprimir("Ingreso: " + ingreso.format(FORMATO_FECHA_HORA));
+        imprimir("Salida: " + salida.format(FORMATO_FECHA_HORA));
+        if (diasACobrar > 0) {
+            imprimir("Días: " + diasACobrar + " x $" + tarifaDia
+                    + " = $" + (diasACobrar * tarifaDia));
+        }
+        if (horasACobrar > 0) {
+            imprimir("Horas: " + horasACobrar + " x $" + tarifaHora
+                    + " = $" + (horasACobrar * tarifaHora));
+        }
+        imprimir("Total a pagar: $" + total);
     }
 
     static int leerEntero(String mensaje, int minimo, int maximo) {

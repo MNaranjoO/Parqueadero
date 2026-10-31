@@ -6,7 +6,6 @@ public class GestionParqueadero {
 
     static final Scanner SCANNER = new Scanner(System.in);
 
-    // Constantes del sistema
     static final int CAPACIDAD_TOTAL = 10;
     static final int TARIFA_HORA_CARRO = 4000;
     static final int TARIFA_DIA_CARRO = 30000;
@@ -25,7 +24,6 @@ public class GestionParqueadero {
     static String[] tiposVehiculo = new String[CAPACIDAD_TOTAL];
     static LocalDateTime[] fechasIngreso = new LocalDateTime[CAPACIDAD_TOTAL];
 
-    // Conteos, tiempo y recaudo
     static int celdasOcupadas;
     static int celdasLibres;
     static long diasACobrar;

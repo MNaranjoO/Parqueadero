@@ -43,8 +43,8 @@ public class GestionParqueadero {
             switch (opcion) {
                 case 1 -> registrarEntrada();
                 case 2 -> registrarSalida();
-                case 3 -> imprimir("Reporte de ocupación (pendiente)");
-                case 4 -> imprimir("Reporte financiero (pendiente)");
+                case 3 -> reporteOcupacion();
+                case 4 -> reporteFinanciero();
                 case 5 -> imprimir("Hasta pronto.");
             }
         } while (opcion != 5);
@@ -186,6 +186,21 @@ public class GestionParqueadero {
                     + " = $" + (horasACobrar * tarifaHora));
         }
         imprimir("Total a pagar: $" + total);
+    }
+
+    static void reporteOcupacion() {
+        imprimir("");
+        imprimir("Reporte de ocupación");
+        imprimir("Celdas ocupadas: " + celdasOcupadas);
+        imprimir("Celdas libres: " + celdasLibres);
+    }
+
+    static void reporteFinanciero() {
+        imprimir("");
+        imprimir("Reporte financiero");
+        imprimir("Recaudo carros: $" + recaudoCarros);
+        imprimir("Recaudo motos: $" + recaudoMotos);
+        imprimir("Total general: $" + (recaudoCarros + recaudoMotos));
     }
 
     static int leerEntero(String mensaje, int minimo, int maximo) {

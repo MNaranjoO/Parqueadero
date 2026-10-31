@@ -77,13 +77,17 @@ public class GestionParqueadero {
         System.out.println(mensaje);
     }
 
-    static void registrarEntrada() {
-        int posicion = -1;
-        for (int i = 0; i < CAPACIDAD_TOTAL && posicion == -1; i++) {
+    static int celdaDisponible() {
+        for (int i = 0; i < CAPACIDAD_TOTAL; i++) {
             if (tiposVehiculo[i] == null) {
-                posicion = i;
+                return i;
             }
         }
+        return -1;
+    }
+
+    static void registrarEntrada() {
+        int posicion = celdaDisponible();
 
         if (posicion == -1) {
             imprimir("El parqueadero está lleno.");
